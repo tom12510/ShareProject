@@ -1,4 +1,4 @@
-package tom;
+package tom.net;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

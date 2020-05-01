@@ -1,4 +1,4 @@
-package tom;
+package tom.stream;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

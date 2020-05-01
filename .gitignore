@@ -1,2 +1,14 @@
 # Project exclude paths
 /out/
+# IntelliJ IDEA Files
+*.iml
+*.ipr
+*.iws
+*.idea
+/.idea
+# Build Artifacts
+.gradle/
+build/
+target/
+bin/
+dependency-reduced-pom.xml

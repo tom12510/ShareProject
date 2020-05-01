@@ -1,4 +1,4 @@
-package tom;
+package tom.stream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
