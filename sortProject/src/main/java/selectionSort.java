@@ -2,6 +2,7 @@ import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import utils.changeArray;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -17,7 +18,7 @@ public class selectionSort {
 
     @Before
     public void init() {
-        integerArr = new Integer[600000];
+        integerArr = new Integer[1000000];
         for (Integer i = 0; i < integerArr.length; i++) {
             int random = new Random().nextInt(3999999 - 2999 + 1) + 2999;
             integerArr[i] = random;
@@ -44,9 +45,12 @@ public class selectionSort {
     }
 
     private static void changeArr(Integer[] arr, int i, int min) {
-        arr[i] = arr[i] + arr[min];
+       /* arr[i] = arr[i] + arr[min];
         arr[min] = arr[i] - arr[min];
-        arr[i] = arr[i] - arr[min];
+        arr[i] = arr[i] - arr[min];*/
+        int temp = arr[i];
+        arr[i] = arr[min];
+        arr[min] = temp;
     }
 
     @Test
@@ -118,14 +122,13 @@ public class selectionSort {
     }
 
     /**
-     *
-     * @param arr  排序数组
+     * @param arr   排序数组
      * @param start 排序开始包含
-     * @param end 排序结尾
+     * @param end   排序结尾
      */
-    public static void  insertSort1(Integer arr[], int start, int end) {
+    public static void insertSort1(Integer arr[], int start, int end) {
 
-        for (int i = start+1; i <=end; i++) {
+        for (int i = start + 1; i <= end; i++) {
             Integer min = arr[i];
             int j;
             for (j = i; j > i && arr[j - 1] > min; j++) {
@@ -142,7 +145,7 @@ public class selectionSort {
         //if (start >= end) return;
         //当分组小于一定数量时 使用插入排序算法完成对子数组的排序
         if (end - start <= 200) {
-            insertSort1(arr,start,end);
+            insertSort1(arr, start, end);
             return;
         }
         //寻找中间索引  整数
@@ -151,12 +154,13 @@ public class selectionSort {
         mergeSort(arr, mid + 1, end); //arr已排序
         //每次进行递归 都把元素分组 当两个子数组的前元素比后元素大才进行归并操作
         //此判断使用于部分有序的排序
-        if (arr[mid] > arr[mid + 1])
+        if (arr[mid] > arr[mid + 1]) {
             merge(arr, start, mid, end);  // 归并操作
+        }
     }
 
     //将两组数组进行归并  arr[start...mid]和 arr[mid+1...end]  闭区间
-    //arr为排序数组
+    //arr为排序数组  归并操作
     private static void merge(Integer[] arr, Integer start, int mid, Integer end) {
         //定义临时数组变量 复制整个排序数组
         Integer[] aux = new Integer[end - start + 1];
@@ -203,4 +207,69 @@ public class selectionSort {
         System.out.println("耗费时间:" + (end - start));
         System.out.println(StringUtils.join(integerArr, " "));
     }
+
+    //自底向上的归并排序 迭代  对链表排序优化
+    public static void mergeSortBU(Integer[] arr) {
+        int length = arr.length;
+        int mid = length / 2;
+        //使用 sz+=sz 迭代循环  1+2+4 形式增加迭代 循环要归并的数组
+        for (int sz = 1; sz <= length; sz += sz) {
+            for (int i = 0; i < length; i += sz + sz) { // 2sz~3sz-1
+                merge(arr, i, i + sz - 1, Math.min(i + sz + sz - 1, length - 1));
+            }
+        }
+    }
+
+    @Test
+    // 10000个元素 11  100000 个元素  61
+    public void mergeSortBUTest() {
+        long start = System.currentTimeMillis();
+        mergeSortBU(integerArr);
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时间:" + (end - start));
+        System.out.println(StringUtils.join(integerArr, " "));
+    }
+
+    //快速排序 使用递归方式 进行排序  QuickSort  [start,end]
+    public static void quickSort(Integer[] arr, int start, int end) {
+        if (start >= end) { //递归到底
+            return;
+        }
+        // 中间值
+        int p = partition(arr, start, end);
+        quickSort(arr, start, p - 1);
+        quickSort(arr, p + 1, end);
+    }
+
+    /**
+     * @param arr        排序数组
+     * @param leftIndex  子数组
+     * @param rightIndex 子数组
+     * @return int 返回p 使的 arr[leftIndex...p-1] <arr[p]   arr[p+1...rightIndex]> arr[p]
+     */
+    private static int partition(Integer[] arr, int leftIndex, int rightIndex) {
+        //计算临时变量 temp 为partition应该在的位置
+        Integer temp = arr[leftIndex];
+        int partitonIndex = leftIndex;
+        for (int i = leftIndex + 1; i <= rightIndex; i++) {
+            if (arr[i] < temp) {
+                changeArray.swap(arr,i,partitonIndex+1);
+                partitonIndex++;
+            }
+        }
+        changeArray.swap(arr,  partitonIndex,leftIndex);
+        return partitonIndex;
+    }
+
+    @Test
+    // 百万级别的速度  296
+    public void quickSortTest() {
+        long start = System.currentTimeMillis();
+        quickSort(integerArr, 0, integerArr.length-1);
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时间:" + (end - start));
+        System.out.println(StringUtils.join(integerArr, " "));
+    }
+
+
 }
